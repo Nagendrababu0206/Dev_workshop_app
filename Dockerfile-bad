@@ -1,26 +1,15 @@
-# =====================================================================
-#  ⚠️  INTENTIONALLY INSECURE DOCKERFILE — FOR TRAINING ONLY  ⚠️
-#  Used in Day 1, Lab 06 (Trivy). Every line below is a bad practice.
-#  Never copy this into a real project.
-# =====================================================================
+# 1. Base image: an official Java 21 runtime (JRE) on Ubuntu
+FROM eclipse-temurin:21-jre
 
-# Old base image (2023) with a full JDK -> many unpatched vulnerabilities
-FROM eclipse-temurin:21.0.1_12-jdk-jammy
-
-# Secrets baked into the image -> readable by anyone who pulls it
-ENV AWS_ACCESS_KEY_ID=AKIAQ3MZ7KX4WB2RT6PN
-ENV AWS_SECRET_ACCESS_KEY=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
-
-# Unnecessary tools -> bigger attack surface
-RUN apt-get update && apt-get install -y curl wget vim netcat-openbsd
-
+# 2. All following commands run inside /app in the image
 WORKDIR /app
+
+# 3. Copy the jar we built with Maven into the image
 COPY target/workshop-app.jar app.jar
 
-# Everyone can modify the application
-RUN chmod 777 app.jar
-
+# 4. Document that the app listens on 8081
 EXPOSE 8081
 
-# No USER instruction -> runs as root. No HEALTHCHECK.
+# 5. Command that runs when a container starts
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
